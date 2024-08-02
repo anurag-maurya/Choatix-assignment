@@ -9,7 +9,7 @@ This is Django project. It generates the all images parallelly from provided pro
 
 ## Setup backend
 ### Clone this repo
-### goto inside this repo
+### go inside this repo
 ### install dependencies: pip install requirements.txt
 ### Add stability API access token and number of images to generate parallelly (for this assigment 3) in file home/.env
 ### run migrations if any: 
@@ -18,7 +18,7 @@ This is Django project. It generates the all images parallelly from provided pro
 ### run server: python manage.py runserver
 
 ### Make sure redis is running in background
-### start celery worker using: celery -A chaotix worker --loglevel=info
+### in another terminal, activate the same virtual env and go to the cloned repo and start celery worker using: celery -A chaotix worker --loglevel=info
 
 
 ## Test it:
