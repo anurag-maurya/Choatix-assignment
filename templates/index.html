@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Generate Images</title>
+    <script>
+      function startGeneration() {
+        console.log("starting generation");
+        document.getElementById("status").innerText = "Generating images...";
+        document.getElementById("results").innerHTML = "";
+
+        let form = document.getElementById("image-form");
+        let formData = new FormData(form);
+
+        // Extract all prompt inputs
+        let prompts = [];
+        for (let pair of formData.entries()) {
+          if (pair[0].startsWith("prompt")) {
+            prompts.push(pair[1]);
+          }
+        }
+        console.log("all pronpts");
+        console.log(prompts);
+
+        // Send prompts to server
+        fetch("/generate/", {
+          method: "POST",
+          body: JSON.stringify({ prompts: prompts }),
+          headers: {
+            "X-CSRFToken": document.querySelector("[name=csrfmiddlewaretoken]")
+              .value,
+            "Content-Type": "application/json",
+          },
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            console.log(`going to checkResults with data: ${data}`);
+            checkResults(data);
+          });
+      }
+
+      function checkResults(taskIds) {
+        let taskIdsArray = Object.values(taskIds);
+        const interval = setInterval(function () {
+          let resultsHTML = "";
+          let completedCount = 0;
+
+          // Use Promise.all to gather all fetch promises
+          const fetchPromises = taskIdsArray.map((taskId) => {
+            return fetch("/get_task_status/?task_id=" + taskId)
+              .then((response) => response.json())
+              .then((data) => {
+                if (data["state"] === "SUCCESS") {
+                  resultsHTML += `<img src="static/generated_images/${data.result}" alt="Image">`;
+                  completedCount++;
+                }
+              });
+          });
+
+          // Wait for all promises to resolve
+          Promise.all(fetchPromises).then(() => {
+            if (completedCount === taskIdsArray.length) {
+              document.getElementById("status").innerText = "Images generated!";
+              document.getElementById("results").innerHTML = resultsHTML;
+              clearInterval(interval);
+            }
+          });
+        }, 3000);
+      }
+    </script>
+  </head>
+  <body>
+    <h1>Enter Prompts to Generate Images</h1>
+    <form id="image-form" method="post">
+      {% csrf_token %}
+      <div id="prompts-container"></div>
+      <input
+        type="button"
+        value="Generate Images"
+        onclick="startGeneration()"
+      />
+    </form>
+    <div id="status"></div>
+    <div id="results"></div>
+    <script>
+      // Populate the prompts based on IMAGES_COUNT
+      document.addEventListener("DOMContentLoaded", function () {
+        fetch("/image_count/")
+          .then((response) => response.json())
+          .then((data) => {
+            let count = data.count;
+            let container = document.getElementById("prompts-container");
+            container.innerHTML = ""; 
+            for (let i = 1; i <= count; i++) {
+              container.innerHTML += `
+                        <label for="prompt${i}">Prompt ${i}:</label>
+                        <textarea id="prompt${i}" name="prompt${i}" cols="50" rows="1"></textarea><br><br>
+                    `;
+            }
+          });
+      });
+    </script>
+  </body>
+</html>
