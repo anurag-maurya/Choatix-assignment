@@ -10,7 +10,7 @@ This is Django project. It generates the all images parallelly from provided pro
 ## Setup backend
 ### Clone this repo
 ### go inside this repo
-### install dependencies: pip install requirements.txt
+### install dependencies: pip install -r requirements.txt
 ### Add stability API access token and number of images to generate parallelly (for this assigment 3) in file home/.env
 ### run migrations if any: 
 ### python manage.py makemigrations
