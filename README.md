@@ -18,7 +18,7 @@ This is Django project. It generates the all images parallelly from provided pro
 ### run server: python manage.py runserver
 
 ### Make sure redis is running in background
-### in another terminal, activate the same virtual env and go to the cloned repo and start celery worker using: celery -A chaotix worker --loglevel=info
+### in another terminal, activate the same virtual env and go to the cloned repo and start celery worker using: celery -A chaotix worker --concurrency=3 --loglevel=info
 
 
 ## Test it:
