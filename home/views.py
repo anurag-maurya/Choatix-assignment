@@ -17,11 +17,6 @@ def index(request):
     return render(request, 'index.html')
 
 
-from django.shortcuts import render
-from django.http import JsonResponse
-from .tasks import generate_image
-
-
 def generate_images(request):
     if request.method == 'POST':
         data = json.loads(request.body)
